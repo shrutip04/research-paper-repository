@@ -7,6 +7,7 @@ const keywordRoutes = require("./routes/keywordRoutes");
 const citationRoutes = require("./routes/citationRoutes");
 const relatedPaperRoutes = require("./routes/relatedPaperRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+const bookmarkRoutes = require("./routes/bookmarkRoutes");
 require("dotenv").config();
 
 const pool = require("./config/db");
@@ -24,6 +25,7 @@ app.use("/api/keywords", keywordRoutes);
 app.use("/api/citations", citationRoutes);
 app.use("/api/related-papers", relatedPaperRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/bookmarks", bookmarkRoutes);
 
 // Express health check
 app.get("/api/health", (req, res) => {
