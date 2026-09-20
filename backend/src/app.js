@@ -2,6 +2,8 @@ const authorRoutes = require("./routes/authorRoutes");
 const express = require("express");
 const cors = require("cors");
 const paperRoutes = require("./routes/paperRoutes");
+const areaRoutes = require("./routes/areaRoutes");
+const keywordRoutes = require("./routes/keywordRoutes");
 require("dotenv").config();
 
 const pool = require("./config/db");
@@ -14,6 +16,8 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/papers", paperRoutes);
 app.use("/api/authors", authorRoutes);
+app.use("/api/areas", areaRoutes);
+app.use("/api/keywords", keywordRoutes);
 
 // Express health check
 app.get("/api/health", (req, res) => {
