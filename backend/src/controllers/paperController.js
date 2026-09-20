@@ -19,6 +19,41 @@ const getAllPapers = async (req, res) => {
     }
 };
 
+const getPaperById = async (req, res) => {
+    try {
+        const paperId = Number(req.params.id);
+
+        if (!Number.isInteger(paperId) || paperId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid paper ID"
+            });
+        }
+
+        const paper = await paperService.getPaperById(paperId);
+
+        if (!paper) {
+            return res.status(404).json({
+                success: false,
+                message: "Paper not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: paper
+        });
+    } catch (error) {
+        console.error("Error fetching paper:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch paper"
+        });
+    }
+};
+
 module.exports = {
-    getAllPapers
+    getAllPapers,
+    getPaperById
 };
