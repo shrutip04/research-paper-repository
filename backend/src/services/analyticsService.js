@@ -13,25 +13,31 @@ const getPaperAnalytics = async () => {
 };
 
 const getAuthorAnalytics = async () => {
-    const query = `
-        SELECT *
+    const result = await pool.query(`
+        SELECT
+            author_id,
+            author_name,
+            affiliation,
+            department,
+            publication_count
         FROM author_productivity
-        ORDER BY total_papers DESC, author_name;
-    `;
-
-    const result = await pool.query(query);
+        ORDER BY publication_count DESC, author_name ASC
+    `);
 
     return result.rows;
 };
 
 const getAreaAnalytics = async () => {
-    const query = `
-        SELECT *
+    const result = await pool.query(`
+        SELECT
+            area_id,
+            area_name,
+            paper_count,
+            researcher_count,
+            citation_count
         FROM research_area_statistics
-        ORDER BY total_papers DESC, area_name;
-    `;
-
-    const result = await pool.query(query);
+        ORDER BY paper_count DESC, area_name ASC
+    `);
 
     return result.rows;
 };
