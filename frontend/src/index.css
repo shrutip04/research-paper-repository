@@ -15,3 +15,77 @@ body {
     background: #f5f7fb;
     color: #1f2937;
 }
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: #111827;
+    color: white;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-logo {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    padding: 0 12px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sidebar-nav a,
+.sidebar-bottom a {
+    padding: 12px;
+    border-radius: 8px;
+    color: #d1d5db;
+}
+
+.sidebar-nav a:hover,
+.sidebar-bottom a:hover {
+    background: #1f2937;
+    color: white;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+}
+
+.main-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar {
+    height: 64px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+}
+
+.navbar-user {
+    color: #6b7280;
+}
+
+.main-content {
+    padding: 32px;
+}
