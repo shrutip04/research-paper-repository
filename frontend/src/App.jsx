@@ -16,6 +16,7 @@ import Areas from "./pages/Areas";
 import Bookmarks from "./pages/Bookmarks";
 import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
+import PaperDetails from "./pages/PaperDetails";
 
 function App() {
     return (
@@ -64,6 +65,11 @@ function App() {
                             <Route
                                 path="/profile"
                                 element={<Profile />}
+                            />
+
+                            <Route 
+                                path="/papers/:id" 
+                                element={<PaperDetails />} 
                             />
 
                         </Route>
