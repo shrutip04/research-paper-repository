@@ -53,7 +53,37 @@ const getPaperById = async (req, res) => {
     }
 };
 
+const searchPapers = async (req, res) => {
+    try {
+        const searchTerm = req.query.q;
+
+        if (!searchTerm || searchTerm.trim() === "") {
+            return res.status(400).json({
+                success: false,
+                message: "Search term is required"
+            });
+        }
+
+        const papers = await paperService.searchPapers(searchTerm.trim());
+
+        res.status(200).json({
+            success: true,
+            count: papers.length,
+            data: papers
+        });
+    } catch (error) {
+        console.error("Error searching papers:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to search papers"
+        });
+    }
+};
+
+
 module.exports = {
     getAllPapers,
-    getPaperById
+    getPaperById,
+    searchPapers
 };

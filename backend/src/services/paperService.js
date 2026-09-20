@@ -61,8 +61,19 @@ const getPaperById = async (paperId) => {
     return result.rows[0] || null;
 };
 
+const searchPapers = async (searchTerm) => {
+    const query = `
+        SELECT *
+        FROM search_papers($1);
+    `;
+
+    const result = await pool.query(query, [searchTerm]);
+
+    return result.rows;
+};
 
 module.exports = {
     getAllPapers,
-    getPaperById
+    getPaperById,
+    searchPapers
 };
