@@ -29,22 +29,18 @@ const getUserBookmarks = async (req, res) => {
     }
 };
 
+
 const createBookmark = async (req, res) => {
     try {
         const paperId = Number(req.params.id);
-        const userId = Number(req.body.user_id);
+
+        // Get user from verified JWT
+        const userId = req.user.user_id;
 
         if (!Number.isInteger(paperId) || paperId <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid paper ID"
-            });
-        }
-
-        if (!Number.isInteger(userId) || userId <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Valid user_id is required"
             });
         }
 
@@ -82,22 +78,18 @@ const createBookmark = async (req, res) => {
     }
 };
 
+
 const deleteBookmark = async (req, res) => {
     try {
         const paperId = Number(req.params.id);
-        const userId = Number(req.body.user_id);
+
+        // Get user from verified JWT
+        const userId = req.user.user_id;
 
         if (!Number.isInteger(paperId) || paperId <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid paper ID"
-            });
-        }
-
-        if (!Number.isInteger(userId) || userId <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Valid user_id is required"
             });
         }
 
@@ -127,6 +119,7 @@ const deleteBookmark = async (req, res) => {
         });
     }
 };
+
 
 module.exports = {
     getUserBookmarks,

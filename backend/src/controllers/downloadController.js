@@ -1,21 +1,17 @@
 const downloadService = require("../services/downloadService");
 
+
 const recordDownload = async (req, res) => {
     try {
         const paperId = Number(req.params.id);
-        const userId = Number(req.body.user_id);
+
+        // Get authenticated user from JWT
+        const userId = req.user.user_id;
 
         if (!Number.isInteger(paperId) || paperId <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid paper ID"
-            });
-        }
-
-        if (!Number.isInteger(userId) || userId <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Valid user_id is required"
             });
         }
 
@@ -45,6 +41,7 @@ const recordDownload = async (req, res) => {
         });
     }
 };
+
 
 const getPaperDownloads = async (req, res) => {
     try {
@@ -81,6 +78,7 @@ const getPaperDownloads = async (req, res) => {
         });
     }
 };
+
 
 module.exports = {
     recordDownload,

@@ -1,5 +1,6 @@
 const reviewService = require("../services/reviewService");
 
+
 const getPaperReviews = async (req, res) => {
     try {
         const paperId = Number(req.params.id);
@@ -12,7 +13,9 @@ const getPaperReviews = async (req, res) => {
         }
 
         const reviews = await reviewService.getPaperReviews(paperId);
-        const summary = await reviewService.getPaperRatingSummary(paperId);
+
+        const summary =
+            await reviewService.getPaperRatingSummary(paperId);
 
         res.status(200).json({
             success: true,
@@ -31,9 +34,18 @@ const getPaperReviews = async (req, res) => {
     }
 };
 
+
 const createReview = async (req, res) => {
     try {
         const paperId = Number(req.params.id);
+
+        // Get authenticated user from JWT
+        const userId = req.user.user_id;
+
+        const {
+            rating,
+            review_text
+        } = req.body;
 
         if (!Number.isInteger(paperId) || paperId <= 0) {
             return res.status(400).json({
@@ -42,20 +54,11 @@ const createReview = async (req, res) => {
             });
         }
 
-        const {
-            user_id,
-            rating,
-            review_text
-        } = req.body;
-
-        if (!Number.isInteger(Number(user_id)) || Number(user_id) <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Valid user_id is required"
-            });
-        }
-
-        if (!Number.isInteger(Number(rating)) || Number(rating) < 1 || Number(rating) > 5) {
+        if (
+            !Number.isInteger(Number(rating)) ||
+            Number(rating) < 1 ||
+            Number(rating) > 5
+        ) {
             return res.status(400).json({
                 success: false,
                 message: "Rating must be an integer between 1 and 5"
@@ -65,7 +68,7 @@ const createReview = async (req, res) => {
         const review = await reviewService.createReview(
             paperId,
             {
-                user_id: Number(user_id),
+                user_id: userId,
                 rating: Number(rating),
                 review_text
             }
@@ -100,9 +103,18 @@ const createReview = async (req, res) => {
     }
 };
 
+
 const updateReview = async (req, res) => {
     try {
         const reviewId = Number(req.params.id);
+
+        // Get authenticated user from JWT
+        const userId = req.user.user_id;
+
+        const {
+            rating,
+            review_text
+        } = req.body;
 
         if (!Number.isInteger(reviewId) || reviewId <= 0) {
             return res.status(400).json({
@@ -111,12 +123,11 @@ const updateReview = async (req, res) => {
             });
         }
 
-        const {
-            rating,
-            review_text
-        } = req.body;
-
-        if (!Number.isInteger(Number(rating)) || Number(rating) < 1 || Number(rating) > 5) {
+        if (
+            !Number.isInteger(Number(rating)) ||
+            Number(rating) < 1 ||
+            Number(rating) > 5
+        ) {
             return res.status(400).json({
                 success: false,
                 message: "Rating must be an integer between 1 and 5"
@@ -125,6 +136,7 @@ const updateReview = async (req, res) => {
 
         const review = await reviewService.updateReview(
             reviewId,
+            userId,
             {
                 rating: Number(rating),
                 review_text
@@ -134,7 +146,7 @@ const updateReview = async (req, res) => {
         if (!review) {
             return res.status(404).json({
                 success: false,
-                message: "Review not found"
+                message: "Review not found or you do not own this review"
             });
         }
 
@@ -152,6 +164,7 @@ const updateReview = async (req, res) => {
         });
     }
 };
+
 
 module.exports = {
     getPaperReviews,

@@ -72,7 +72,7 @@ const createReview = async (paperId, reviewData) => {
     return result.rows[0];
 };
 
-const updateReview = async (reviewId, reviewData) => {
+const updateReview = async (reviewId, userId, reviewData) => {
     const {
         rating,
         review_text
@@ -85,6 +85,7 @@ const updateReview = async (reviewId, reviewData) => {
             review_text = $2,
             updated_at = CURRENT_TIMESTAMP
         WHERE review_id = $3
+          AND user_id = $4
         RETURNING
             review_id,
             paper_id,
@@ -98,7 +99,8 @@ const updateReview = async (reviewId, reviewData) => {
     const result = await pool.query(query, [
         rating,
         review_text || null,
-        reviewId
+        reviewId,
+        userId
     ]);
 
     return result.rows[0] || null;
