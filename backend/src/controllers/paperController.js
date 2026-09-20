@@ -277,11 +277,46 @@ const updatePaper = async (req, res) => {
     }
 };
 
+const deletePaper = async (req, res) => {
+    try {
+        const paperId = Number(req.params.id);
+
+        if (!Number.isInteger(paperId) || paperId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid paper ID"
+            });
+        }
+
+        const deletedPaper = await paperService.deletePaper(paperId);
+
+        if (!deletedPaper) {
+            return res.status(404).json({
+                success: false,
+                message: "Paper not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Paper deleted successfully",
+            data: deletedPaper
+        });
+    } catch (error) {
+        console.error("Error deleting paper:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to delete paper"
+        });
+    }
+};
 
 module.exports = {
     getAllPapers,
     getPaperById,
     searchPapers,
     createPaper,
-    updatePaper
+    updatePaper,
+    deletePaper
 };

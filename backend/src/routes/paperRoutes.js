@@ -13,4 +13,6 @@ router.post("/", paperController.createPaper);
 
 router.put("/:id", paperController.updatePaper);
 
+router.delete("/:id", paperController.deletePaper);
+
 module.exports = router;

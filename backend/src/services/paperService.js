@@ -186,10 +186,26 @@ const updatePaper = async (paperId, paperData) => {
     return result.rows[0] || null;
 };
 
+const deletePaper = async (paperId) => {
+    const query = `
+        DELETE FROM papers
+        WHERE paper_id = $1
+        RETURNING
+            paper_id,
+            title,
+            publication_year;
+    `;
+
+    const result = await pool.query(query, [paperId]);
+
+    return result.rows[0] || null;
+};
+
 module.exports = {
     getAllPapers,
     getPaperById,
     searchPapers,
     createPaper,
-    updatePaper
+    updatePaper,
+    deletePaper
 };
