@@ -1,7 +1,7 @@
 const pool = require("../config/db");
 
-const getAllPapers = async () => {
-    const query = `
+const getAllPapers = async (filters = {}) => {
+    let query = `
         SELECT
             p.paper_id,
             p.title,
@@ -21,10 +21,35 @@ const getAllPapers = async () => {
             ON p.area_id = ra.area_id
         LEFT JOIN publication_venues pv
             ON p.venue_id = pv.venue_id
+    `;
+
+    const conditions = [];
+    const values = [];
+
+    if (filters.area !== undefined) {
+        values.push(filters.area);
+        conditions.push(`p.area_id = $${values.length}`);
+    }
+
+    if (filters.year !== undefined) {
+        values.push(filters.year);
+        conditions.push(`p.publication_year = $${values.length}`);
+    }
+
+    if (filters.paper_type !== undefined) {
+        values.push(filters.paper_type);
+        conditions.push(`p.paper_type = $${values.length}`);
+    }
+
+    if (conditions.length > 0) {
+        query += ` WHERE ${conditions.join(" AND ")}`;
+    }
+
+    query += `
         ORDER BY p.publication_year DESC, p.paper_id;
     `;
 
-    const result = await pool.query(query);
+    const result = await pool.query(query, values);
 
     return result.rows;
 };

@@ -2,7 +2,60 @@ const paperService = require("../services/paperService");
 
 const getAllPapers = async (req, res) => {
     try {
-        const papers = await paperService.getAllPapers();
+        const { area, year, paper_type } = req.query;
+
+        const filters = {};
+
+        if (area !== undefined) {
+            const areaId = Number(area);
+
+            if (!Number.isInteger(areaId) || areaId <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid area parameter"
+                });
+            }
+
+            filters.area = areaId;
+        }
+
+        if (year !== undefined) {
+            const publicationYear = Number(year);
+
+            if (
+                !Number.isInteger(publicationYear) ||
+                publicationYear < 1900 ||
+                publicationYear > 2100
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid year parameter"
+                });
+            }
+
+            filters.year = publicationYear;
+        }
+
+        if (paper_type !== undefined) {
+            const validPaperTypes = [
+                "RESEARCH",
+                "REVIEW",
+                "SURVEY",
+                "CASE_STUDY",
+                "SHORT_PAPER"
+            ];
+
+            if (!validPaperTypes.includes(paper_type)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid paper_type"
+                });
+            }
+
+            filters.paper_type = paper_type;
+        }
+
+        const papers = await paperService.getAllPapers(filters);
 
         res.status(200).json({
             success: true,
