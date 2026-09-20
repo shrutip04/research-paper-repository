@@ -1,31 +1,41 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/api";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem("researchsphere_token");
+        const loadUser = async () => {
+            const token = localStorage.getItem("researchsphere_token");
 
-        if (!token) {
-            setLoading(false);
-            return;
-        }
+            if (!token) {
+                setLoading(false);
+                return;
+            }
 
-        api.get("/auth/me")
-            .then((response) => {
-                setUser(response.data.user);
-            })
-            .catch(() => {
+            try {
+                const response = await api.get("/auth/me");
+
+                const userData =
+                    response.data?.user ||
+                    response.data?.data ||
+                    response.data;
+
+                setUser(userData);
+            } catch (error) {
+                console.error("Failed to restore session:", error);
+
                 localStorage.removeItem("researchsphere_token");
                 setUser(null);
-            })
-            .finally(() => {
+            } finally {
                 setLoading(false);
-            });
+            }
+        };
+
+        loadUser();
     }, []);
 
     const login = async (email, password) => {
@@ -38,7 +48,11 @@ export function AuthProvider({ children }) {
 
         localStorage.setItem("researchsphere_token", token);
 
-        setUser(response.data.user);
+        const userData =
+            response.data?.user ||
+            response.data?.data?.user;
+
+        setUser(userData);
 
         return response.data;
     };
@@ -68,8 +82,6 @@ export function AuthProvider({ children }) {
             {children}
         </AuthContext.Provider>
     );
-}
+};
 
-export function useAuth() {
-    return useContext(AuthContext);
-}
+export const useAuth = () => useContext(AuthContext);

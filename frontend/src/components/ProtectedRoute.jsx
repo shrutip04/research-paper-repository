@@ -5,7 +5,11 @@ function ProtectedRoute() {
     const { isAuthenticated, loading } = useAuth();
 
     if (loading) {
-        return <p>Loading...</p>;
+        return (
+            <div className="loading-state">
+                Loading ResearchSphere...
+            </div>
+        );
     }
 
     if (!isAuthenticated) {
