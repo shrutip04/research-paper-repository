@@ -11,6 +11,7 @@ const bookmarkRoutes = require("./routes/bookmarkRoutes");
 const downloadRoutes = require("./routes/downloadRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const impactRoutes = require("./routes/impactRoutes");
+const authRoutes = require("./routes/authRoutes");
 require("dotenv").config();
 
 const pool = require("./config/db");
@@ -32,6 +33,7 @@ app.use("/api/bookmarks", bookmarkRoutes);
 app.use("/api/downloads", downloadRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/impact", impactRoutes);
+app.use("/api/auth", authRoutes);
 
 // Express health check
 app.get("/api/health", (req, res) => {
