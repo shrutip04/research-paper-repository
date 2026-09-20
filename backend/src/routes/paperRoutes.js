@@ -1,12 +1,8 @@
 const express = require("express");
+const paperController = require("../controllers/paperController");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: "Paper API route is working"
-    });
-});
+router.get("/", paperController.getAllPapers);
 
 module.exports = router;
