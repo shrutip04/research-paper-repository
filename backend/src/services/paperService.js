@@ -97,8 +97,54 @@ const searchPapers = async (searchTerm) => {
     return result.rows;
 };
 
+const createPaper = async (paperData) => {
+    const query = `
+        INSERT INTO papers (
+            title,
+            abstract,
+            publication_year,
+            doi,
+            paper_type,
+            file_url,
+            area_id,
+            venue_id,
+            uploaded_by
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        RETURNING
+            paper_id,
+            title,
+            abstract,
+            publication_year,
+            doi,
+            paper_type,
+            file_url,
+            area_id,
+            venue_id,
+            uploaded_by,
+            created_at;
+    `;
+
+    const values = [
+        paperData.title,
+        paperData.abstract || null,
+        paperData.publication_year,
+        paperData.doi || null,
+        paperData.paper_type || null,
+        paperData.file_url || null,
+        paperData.area_id,
+        paperData.venue_id || null,
+        paperData.uploaded_by
+    ];
+
+    const result = await pool.query(query, values);
+
+    return result.rows[0];
+};
+
 module.exports = {
     getAllPapers,
     getPaperById,
-    searchPapers
+    searchPapers,
+    createPaper
 };

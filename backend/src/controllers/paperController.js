@@ -134,9 +134,76 @@ const searchPapers = async (req, res) => {
     }
 };
 
+const createPaper = async (req, res) => {
+    try {
+        const {
+            title,
+            abstract,
+            publication_year,
+            doi,
+            paper_type,
+            file_url,
+            area_id,
+            venue_id,
+            uploaded_by
+        } = req.body;
+
+        if (
+            !title ||
+            !publication_year ||
+            !area_id ||
+            !uploaded_by
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "title, publication_year, area_id and uploaded_by are required"
+            });
+        }
+
+        const paper = await paperService.createPaper({
+            title,
+            abstract,
+            publication_year,
+            doi,
+            paper_type,
+            file_url,
+            area_id,
+            venue_id,
+            uploaded_by
+        });
+
+        res.status(201).json({
+            success: true,
+            message: "Paper created successfully",
+            data: paper
+        });
+    } catch (error) {
+        console.error("Error creating paper:", error);
+
+        if (error.code === "23505") {
+            return res.status(409).json({
+                success: false,
+                message: "A paper with this DOI already exists"
+            });
+        }
+
+        if (error.code === "23503") {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid research area, venue, or uploader"
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to create paper"
+        });
+    }
+};
 
 module.exports = {
     getAllPapers,
     getPaperById,
-    searchPapers
+    searchPapers,
+    createPaper
 };

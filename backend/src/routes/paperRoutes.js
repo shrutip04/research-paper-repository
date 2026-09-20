@@ -9,4 +9,6 @@ router.get("/search", paperController.searchPapers);
 
 router.get("/:id", paperController.getPaperById);
 
+router.post("/", paperController.createPaper);
+
 module.exports = router;
