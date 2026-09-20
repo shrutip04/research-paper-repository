@@ -142,9 +142,54 @@ const createPaper = async (paperData) => {
     return result.rows[0];
 };
 
+const updatePaper = async (paperId, paperData) => {
+    const query = `
+        UPDATE papers
+        SET
+            title = $1,
+            abstract = $2,
+            publication_year = $3,
+            doi = $4,
+            paper_type = $5,
+            file_url = $6,
+            area_id = $7,
+            venue_id = $8
+        WHERE paper_id = $9
+        RETURNING
+            paper_id,
+            title,
+            abstract,
+            publication_year,
+            doi,
+            paper_type,
+            file_url,
+            area_id,
+            venue_id,
+            uploaded_by,
+            created_at;
+    `;
+
+    const values = [
+        paperData.title,
+        paperData.abstract || null,
+        paperData.publication_year,
+        paperData.doi || null,
+        paperData.paper_type || null,
+        paperData.file_url || null,
+        paperData.area_id,
+        paperData.venue_id || null,
+        paperId
+    ];
+
+    const result = await pool.query(query, values);
+
+    return result.rows[0] || null;
+};
+
 module.exports = {
     getAllPapers,
     getPaperById,
     searchPapers,
-    createPaper
+    createPaper,
+    updatePaper
 };

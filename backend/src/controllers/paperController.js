@@ -201,9 +201,87 @@ const createPaper = async (req, res) => {
     }
 };
 
+const updatePaper = async (req, res) => {
+    try {
+        const paperId = Number(req.params.id);
+
+        if (!Number.isInteger(paperId) || paperId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid paper ID"
+            });
+        }
+
+        const {
+            title,
+            abstract,
+            publication_year,
+            doi,
+            paper_type,
+            file_url,
+            area_id,
+            venue_id
+        } = req.body;
+
+        if (!title || !publication_year || !area_id) {
+            return res.status(400).json({
+                success: false,
+                message: "title, publication_year and area_id are required"
+            });
+        }
+
+        const paper = await paperService.updatePaper(paperId, {
+            title,
+            abstract,
+            publication_year,
+            doi,
+            paper_type,
+            file_url,
+            area_id,
+            venue_id
+        });
+
+        if (!paper) {
+            return res.status(404).json({
+                success: false,
+                message: "Paper not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Paper updated successfully",
+            data: paper
+        });
+    } catch (error) {
+        console.error("Error updating paper:", error);
+
+        if (error.code === "23505") {
+            return res.status(409).json({
+                success: false,
+                message: "A paper with this DOI already exists"
+            });
+        }
+
+        if (error.code === "23503") {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid research area or venue"
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to update paper"
+        });
+    }
+};
+
+
 module.exports = {
     getAllPapers,
     getPaperById,
     searchPapers,
-    createPaper
+    createPaper,
+    updatePaper
 };

@@ -11,4 +11,6 @@ router.get("/:id", paperController.getPaperById);
 
 router.post("/", paperController.createPaper);
 
+router.put("/:id", paperController.updatePaper);
+
 module.exports = router;
