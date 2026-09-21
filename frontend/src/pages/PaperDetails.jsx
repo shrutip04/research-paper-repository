@@ -19,6 +19,8 @@ function PaperDetails() {
     const [citedBy, setCitedBy] = useState([]);
     const [citationStats, setCitationStats] = useState(null);
 
+    const [relatedPapers, setRelatedPapers] = useState([]);
+
     useEffect(() => {
         const fetchPaper = async () => {
             try {
@@ -101,6 +103,27 @@ function PaperDetails() {
                     console.error(
                         "Error fetching citation data:",
                         citationError
+                    );
+                }
+
+                // Fetch related papers
+                try {
+                    const relatedResponse = await api.get(
+                        `/papers/${id}/related`
+                    );
+
+                    const relatedData =
+                        relatedResponse.data?.data ||
+                        relatedResponse.data?.papers ||
+                        [];
+
+                    if (Array.isArray(relatedData)) {
+                        setRelatedPapers(relatedData);
+                    }
+                } catch (relatedError) {
+                    console.error(
+                        "Error fetching related papers:",
+                        relatedError
                     );
                 }
             } catch (err) {
@@ -201,6 +224,7 @@ function PaperDetails() {
 
             <div className="paper-details-card">
 
+                {/* Paper Header */}
                 <div className="paper-details-header">
 
                     <div>
@@ -241,6 +265,7 @@ function PaperDetails() {
 
                 </div>
 
+                {/* Paper Metadata */}
                 <div className="paper-meta">
 
                     <span>
@@ -267,6 +292,7 @@ function PaperDetails() {
 
                 </div>
 
+                {/* Abstract */}
                 {paper.abstract && (
                     <section className="paper-section">
 
@@ -279,6 +305,7 @@ function PaperDetails() {
                     </section>
                 )}
 
+                {/* Paper Information */}
                 <section className="paper-section">
 
                     <h2>Paper Information</h2>
@@ -325,6 +352,7 @@ function PaperDetails() {
 
                 </section>
 
+                {/* Citation Network */}
                 <section className="paper-section">
 
                     <div className="citation-header">
@@ -367,6 +395,7 @@ function PaperDetails() {
 
                     <div className="citation-columns">
 
+                        {/* Papers This Paper Cites */}
                         <div>
 
                             <h3>
@@ -418,6 +447,7 @@ function PaperDetails() {
 
                         </div>
 
+                        {/* Papers Citing This Paper */}
                         <div>
 
                             <h3>
@@ -470,6 +500,84 @@ function PaperDetails() {
                         </div>
 
                     </div>
+
+                </section>
+
+                {/* Related Research */}
+                <section className="paper-section related-section">
+
+                    <div className="section-header">
+
+                        <h2>Related Research</h2>
+
+                        <p>
+                            Discover papers connected through
+                            research areas, keywords, and authors.
+                        </p>
+
+                    </div>
+
+                    {relatedPapers.length === 0 ? (
+                        <p className="empty-text">
+                            No related papers found.
+                        </p>
+                    ) : (
+                        <div className="related-grid">
+
+                            {relatedPapers.map((related) => (
+                                <div
+                                    className="related-card"
+                                    key={related.paper_id}
+                                >
+
+                                    <span className="paper-type-badge">
+                                        {related.paper_type ||
+                                            "Research Paper"}
+                                    </span>
+
+                                    <h3>
+                                        {related.title}
+                                    </h3>
+
+                                    <p className="related-meta">
+                                        {related.area_name ||
+                                            "Research Area"}
+
+                                        {related.publication_year &&
+                                            ` • ${related.publication_year}`}
+                                    </p>
+
+                                    <div className="related-stats">
+
+                                        <span>
+                                            🔑 Shared Keywords:{" "}
+                                            {related.shared_keywords}
+                                        </span>
+
+                                        <span>
+                                            👥 Shared Authors:{" "}
+                                            {related.shared_authors}
+                                        </span>
+
+                                        <span>
+                                            ⭐ Relevance:{" "}
+                                            {related.relevance_score}
+                                        </span>
+
+                                    </div>
+
+                                    <Link
+                                        to={`/papers/${related.paper_id}`}
+                                        className="view-paper-button"
+                                    >
+                                        View Paper →
+                                    </Link>
+
+                                </div>
+                            ))}
+
+                        </div>
+                    )}
 
                 </section>
 
