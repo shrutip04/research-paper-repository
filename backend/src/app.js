@@ -27,7 +27,7 @@ app.use("/api/papers", paperRoutes);
 app.use("/api/authors", authorRoutes);
 app.use("/api/areas", areaRoutes);
 app.use("/api/keywords", keywordRoutes);
-app.use("/api/citations", citationRoutes);
+app.use("/api/papers", citationRoutes);
 app.use("/api/related-papers", relatedPaperRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api", bookmarkRoutes);
@@ -36,6 +36,7 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/impact", impactRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+
 
 // Express health check
 app.get("/api/health", (req, res) => {
