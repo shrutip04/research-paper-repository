@@ -28,7 +28,7 @@ app.use("/api/authors", authorRoutes);
 app.use("/api/areas", areaRoutes);
 app.use("/api/keywords", keywordRoutes);
 app.use("/api/papers", citationRoutes);
-app.use("/api/related-papers", relatedPaperRoutes);
+app.use("/api/papers", relatedPaperRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api", bookmarkRoutes);
 app.use("/api", downloadRoutes);
