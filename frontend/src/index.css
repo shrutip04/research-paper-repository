@@ -674,3 +674,57 @@ a {
         gap: 15px;
     }
 }
+
+.download-button {
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    background: #111827;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.bookmark-button:hover {
+    opacity: 0.85;
+}
+
+.bookmark-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.paper-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.paper-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.download-button {
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    background: #2563eb;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.download-button:hover {
+    opacity: 0.85;
+}
+
+.download-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

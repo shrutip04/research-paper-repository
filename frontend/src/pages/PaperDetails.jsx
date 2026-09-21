@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import api from "../services/api";
 
 function PaperDetails() {
@@ -8,6 +8,12 @@ function PaperDetails() {
     const [paper, setPaper] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const [bookmarked, setBookmarked] = useState(false);
+    const [bookmarkLoading, setBookmarkLoading] = useState(false);
+
+    const [downloadCount, setDownloadCount] = useState(0);
+    const [downloadLoading, setDownloadLoading] = useState(false);
 
     useEffect(() => {
         const fetchPaper = async () => {
@@ -23,6 +29,24 @@ function PaperDetails() {
                     response.data;
 
                 setPaper(data);
+                try {
+    const downloadResponse = await api.get(`/papers/${id}/downloads`);
+
+    const downloadData =
+        downloadResponse.data?.downloads ||
+        downloadResponse.data?.data ||
+        downloadResponse.data;
+
+    if (Array.isArray(downloadData)) {
+        setDownloadCount(downloadData.length);
+    } else if (typeof downloadData === "number") {
+        setDownloadCount(downloadData);
+    } else if (downloadData?.count !== undefined) {
+        setDownloadCount(downloadData.count);
+    }
+} catch (downloadError) {
+    console.error("Error fetching downloads:", downloadError);
+}
             } catch (err) {
                 console.error("Error fetching paper:", err);
 
@@ -37,6 +61,42 @@ function PaperDetails() {
 
         fetchPaper();
     }, [id]);
+
+    const handleBookmark = async () => {
+        try {
+            setBookmarkLoading(true);
+
+            if (!bookmarked) {
+                await api.post(`/papers/${id}/bookmark`);
+                setBookmarked(true);
+            } else {
+                await api.delete(`/papers/${id}/bookmark`);
+                setBookmarked(false);
+            }
+        } catch (err) {
+            console.error("Bookmark error:", err);
+
+            if (err.response?.status === 409) {
+                setBookmarked(true);
+            }
+        } finally {
+            setBookmarkLoading(false);
+        }
+    };
+
+    const handleDownload = async () => {
+    try {
+        setDownloadLoading(true);
+
+        await api.post(`/papers/${id}/download`);
+
+        setDownloadCount((previousCount) => previousCount + 1);
+    } catch (err) {
+        console.error("Download error:", err);
+    } finally {
+        setDownloadLoading(false);
+    }
+};
 
     if (loading) {
         return (
@@ -97,9 +157,34 @@ function PaperDetails() {
                         </h1>
                     </div>
 
+                    <button
+                        type="button"
+                        onClick={handleBookmark}
+                        disabled={bookmarkLoading}
+                        className="bookmark-button"
+                    >
+                        {bookmarkLoading
+                            ? "Saving..."
+                            : bookmarked
+                                ? "🔖 Bookmarked"
+                                : "🔖 Bookmark"}
+                    </button>
+
+                    <button
+                       type="button"
+    onClick={handleDownload}
+    disabled={downloadLoading}
+    className="download-button"
+>
+    {downloadLoading ? "Recording..." : "⬇️ Download"}
+</button>
+
                 </div>
 
                 <div className="paper-meta">
+                    <span>
+                    ⬇️ {downloadCount} downloads
+                    </span>
 
                     {paper.publication_year && (
                         <span>
@@ -124,6 +209,7 @@ function PaperDetails() {
                 {paper.abstract && (
                     <section className="paper-section">
                         <h2>Abstract</h2>
+
                         <p>
                             {paper.abstract}
                         </p>
