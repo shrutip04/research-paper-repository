@@ -4,9 +4,9 @@ const getAllKeywords = async () => {
     const query = `
         SELECT
             keyword_id,
-            keyword
+            keyword_name
         FROM keywords
-        ORDER BY keyword;
+        ORDER BY keyword_name;
     `;
 
     const result = await pool.query(query);

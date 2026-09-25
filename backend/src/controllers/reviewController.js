@@ -1,6 +1,10 @@
 const reviewService = require("../services/reviewService");
 
 
+// ==========================================
+// GET PAPER REVIEWS
+// ==========================================
+
 const getPaperReviews = async (req, res) => {
     try {
         const paperId = Number(req.params.id);
@@ -12,7 +16,8 @@ const getPaperReviews = async (req, res) => {
             });
         }
 
-        const reviews = await reviewService.getPaperReviews(paperId);
+        const reviews =
+            await reviewService.getPaperReviews(paperId);
 
         const summary =
             await reviewService.getPaperRatingSummary(paperId);
@@ -24,8 +29,12 @@ const getPaperReviews = async (req, res) => {
             count: reviews.length,
             data: reviews
         });
+
     } catch (error) {
-        console.error("Error fetching reviews:", error);
+        console.error(
+            "Error fetching reviews:",
+            error
+        );
 
         res.status(500).json({
             success: false,
@@ -35,16 +44,20 @@ const getPaperReviews = async (req, res) => {
 };
 
 
+// ==========================================
+// CREATE REVIEW
+// ==========================================
+
 const createReview = async (req, res) => {
     try {
         const paperId = Number(req.params.id);
 
-        // Get authenticated user from JWT
+        // User comes from authenticated JWT
         const userId = req.user.user_id;
 
         const {
             rating,
-            review_text
+            comment
         } = req.body;
 
         if (!Number.isInteger(paperId) || paperId <= 0) {
@@ -65,23 +78,29 @@ const createReview = async (req, res) => {
             });
         }
 
-        const review = await reviewService.createReview(
-            paperId,
-            {
-                user_id: userId,
-                rating: Number(rating),
-                review_text
-            }
-        );
+        const review =
+            await reviewService.createReview(
+                paperId,
+                {
+                    user_id: userId,
+                    rating: Number(rating),
+                    comment
+                }
+            );
 
         res.status(201).json({
             success: true,
             message: "Review created successfully",
             data: review
         });
-    } catch (error) {
-        console.error("Error creating review:", error);
 
+    } catch (error) {
+        console.error(
+            "Error creating review:",
+            error
+        );
+
+        // Duplicate user-paper review
         if (error.code === "23505") {
             return res.status(409).json({
                 success: false,
@@ -89,6 +108,7 @@ const createReview = async (req, res) => {
             });
         }
 
+        // Foreign-key violation
         if (error.code === "23503") {
             return res.status(400).json({
                 success: false,
@@ -104,19 +124,26 @@ const createReview = async (req, res) => {
 };
 
 
+// ==========================================
+// UPDATE REVIEW
+// ==========================================
+
 const updateReview = async (req, res) => {
     try {
         const reviewId = Number(req.params.id);
 
-        // Get authenticated user from JWT
+        // User comes from authenticated JWT
         const userId = req.user.user_id;
 
         const {
             rating,
-            review_text
+            comment
         } = req.body;
 
-        if (!Number.isInteger(reviewId) || reviewId <= 0) {
+        if (
+            !Number.isInteger(reviewId) ||
+            reviewId <= 0
+        ) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid review ID"
@@ -134,19 +161,21 @@ const updateReview = async (req, res) => {
             });
         }
 
-        const review = await reviewService.updateReview(
-            reviewId,
-            userId,
-            {
-                rating: Number(rating),
-                review_text
-            }
-        );
+        const review =
+            await reviewService.updateReview(
+                reviewId,
+                userId,
+                {
+                    rating: Number(rating),
+                    comment
+                }
+            );
 
         if (!review) {
             return res.status(404).json({
                 success: false,
-                message: "Review not found or you do not own this review"
+                message:
+                    "Review not found or you do not own this review"
             });
         }
 
@@ -155,8 +184,12 @@ const updateReview = async (req, res) => {
             message: "Review updated successfully",
             data: review
         });
+
     } catch (error) {
-        console.error("Error updating review:", error);
+        console.error(
+            "Error updating review:",
+            error
+        );
 
         res.status(500).json({
             success: false,
@@ -166,7 +199,33 @@ const updateReview = async (req, res) => {
 };
 
 
+// ==========================================
+// GET MY REVIEWS
+// ==========================================
+
+const getMyReviews = async (req, res) => {
+    try {
+        const reviews =
+            await reviewService.getUserReviews(req.user.user_id);
+
+        res.status(200).json({
+            success: true,
+            count: reviews.length,
+            data: reviews
+        });
+    } catch (error) {
+        console.error("Error fetching my reviews:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch your reviews"
+        });
+    }
+};
+
+
 module.exports = {
+    getMyReviews,
     getPaperReviews,
     createReview,
     updateReview

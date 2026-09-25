@@ -871,3 +871,209 @@ a {
     }
 }
 
+
+/* ==========================================
+   Authors / Areas / Analytics / Admin / MyReviews
+   (added for full feature parity across pages)
+   ========================================== */
+
+.subheading {
+    margin: 30px 0 14px;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 16px;
+}
+
+.info-card {
+    display: block;
+    text-align: left;
+    background: white;
+    border: 1px solid #e7eaf0;
+    border-radius: 15px;
+    padding: 18px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    text-decoration: none;
+}
+
+.info-card:hover {
+    border-color: #172033;
+}
+
+.info-card.selected {
+    border-color: #172033;
+    box-shadow: 0 0 0 1px #172033;
+}
+
+.info-card h3 {
+    margin: 0 0 6px;
+}
+
+.muted {
+    color: #7b8495;
+    font-size: 13px;
+}
+
+.pill {
+    display: inline-block;
+    background: #eef1f6;
+    color: #172033;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+.chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip {
+    border: 1px solid #e7eaf0;
+    background: white;
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.chip.selected,
+.chip:hover {
+    background: #172033;
+    color: white;
+    border-color: #172033;
+}
+
+.results-panel {
+    margin-top: 22px;
+}
+
+.list-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.list-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 25px;
+    border-bottom: 1px solid #f0f2f6;
+    text-decoration: none;
+    color: inherit;
+}
+
+.list-row:last-child {
+    border-bottom: none;
+}
+
+.list-row:hover {
+    background: #f8f9fb;
+}
+
+.bar-list {
+    padding: 8px 25px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bar-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 40px;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.bar-label {
+    color: #34405a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bar-track {
+    background: #eef1f6;
+    border-radius: 6px;
+    height: 10px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    background: #172033;
+    height: 100%;
+    border-radius: 6px;
+}
+
+.bar-value {
+    text-align: right;
+    font-weight: 700;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.data-table th,
+.data-table td {
+    text-align: left;
+    padding: 12px 25px;
+    border-bottom: 1px solid #f0f2f6;
+    white-space: nowrap;
+}
+
+.data-table th {
+    color: #7b8495;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.profile-panel {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 420px;
+}
+
+.detail-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 16px;
+    margin: 0;
+}
+
+.detail-list dt {
+    color: #7b8495;
+    font-size: 13px;
+}
+
+.detail-list dd {
+    margin: 0;
+    font-weight: 600;
+}
+
+.review-rating {
+    color: #e0a500;
+    letter-spacing: 2px;
+}
+
+.review-date {
+    color: #7b8495;
+    font-size: 12px;
+}

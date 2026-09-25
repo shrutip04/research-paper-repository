@@ -1,6 +1,8 @@
 const authorRoutes = require("./routes/authorRoutes");
+
 const express = require("express");
 const cors = require("cors");
+
 const paperRoutes = require("./routes/paperRoutes");
 const areaRoutes = require("./routes/areaRoutes");
 const keywordRoutes = require("./routes/keywordRoutes");
@@ -13,32 +15,78 @@ const analyticsRoutes = require("./routes/analyticsRoutes");
 const impactRoutes = require("./routes/impactRoutes");
 const authRoutes = require("./routes/authRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+
 require("dotenv").config();
 
 const pool = require("./config/db");
+
 const app = express();
 
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+
+// ==========================================
+// MIDDLEWARE
+// ==========================================
+
 app.use(cors());
+
 app.use(express.json());
+
+
+// ==========================================
+// ROUTES
+// ==========================================
+
 app.use("/api/papers", paperRoutes);
+
 app.use("/api/authors", authorRoutes);
+
 app.use("/api/areas", areaRoutes);
+
 app.use("/api/keywords", keywordRoutes);
+
+
+// Citation routes
 app.use("/api/papers", citationRoutes);
+
+
+// Related paper routes
 app.use("/api/papers", relatedPaperRoutes);
-app.use("/api/reviews", reviewRoutes);
+
+
+// Review routes
+app.use("/api", reviewRoutes);
+
+
+// Bookmark routes
 app.use("/api", bookmarkRoutes);
+
+
+// Download routes
 app.use("/api", downloadRoutes);
+
+
+// Analytics routes
 app.use("/api/analytics", analyticsRoutes);
+
+
+// Impact routes
 app.use("/api/impact", impactRoutes);
+
+
+// Authentication routes
 app.use("/api/auth", authRoutes);
+
+
+// Admin routes
 app.use("/api/admin", adminRoutes);
 
 
-// Express health check
+// ==========================================
+// EXPRESS HEALTH CHECK
+// ==========================================
+
 app.get("/api/health", (req, res) => {
     res.status(200).json({
         success: true,
@@ -46,10 +94,16 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-// PostgreSQL health check
+
+// ==========================================
+// POSTGRESQL HEALTH CHECK
+// ==========================================
+
 app.get("/api/health/db", async (req, res) => {
     try {
-        const result = await pool.query("SELECT NOW() AS current_time");
+        const result = await pool.query(
+            "SELECT NOW() AS current_time"
+        );
 
         res.status(200).json({
             success: true,
@@ -57,8 +111,12 @@ app.get("/api/health/db", async (req, res) => {
             database: "research_repository",
             currentTime: result.rows[0].current_time
         });
+
     } catch (error) {
-        console.error("Database connection error:", error);
+        console.error(
+            "Database connection error:",
+            error
+        );
 
         res.status(500).json({
             success: false,
@@ -67,7 +125,13 @@ app.get("/api/health/db", async (req, res) => {
     }
 });
 
-// Start server
+
+// ==========================================
+// START SERVER
+// ==========================================
+
 app.listen(PORT, () => {
-    console.log(`ResearchSphere API running on http://localhost:${PORT}`);
+    console.log(
+        `ResearchSphere API running on http://localhost:${PORT}`
+    );
 });

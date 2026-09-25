@@ -3,7 +3,12 @@ const express = require("express");
 const { authenticateToken } = require("../middleware/authMiddleware");
 const { authorizeRoles } = require("../middleware/roleMiddleware");
 
+const adminController = require("../controllers/adminController");
+
 const router = express.Router();
+
+// Every admin route requires a valid JWT AND the ADMIN role
+router.use(authenticateToken, authorizeRoles("ADMIN"));
 
 router.get(
     "/dashboard",
@@ -17,5 +22,11 @@ router.get(
         });
     }
 );
+
+router.get("/stats", adminController.getStats);
+
+router.get("/users", adminController.getUsers);
+
+router.get("/audit-logs", adminController.getAuditLogs);
 
 module.exports = router;

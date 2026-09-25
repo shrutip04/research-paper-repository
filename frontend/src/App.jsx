@@ -12,11 +12,14 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Discover from "./pages/Discover";
 import Authors from "./pages/Authors";
+import AuthorProfile from "./pages/AuthorProfile";
 import Areas from "./pages/Areas";
 import Bookmarks from "./pages/Bookmarks";
+import MyReviews from "./pages/MyReviews";
 import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
 import PaperDetails from "./pages/PaperDetails";
+import Admin from "./pages/Admin";
 
 function App() {
     return (
@@ -48,6 +51,11 @@ function App() {
                             />
 
                             <Route
+                                path="/authors/:id"
+                                element={<AuthorProfile />}
+                            />
+
+                            <Route
                                 path="/areas"
                                 element={<Areas />}
                             />
@@ -55,6 +63,11 @@ function App() {
                             <Route
                                 path="/bookmarks"
                                 element={<Bookmarks />}
+                            />
+
+                            <Route
+                                path="/reviews/me"
+                                element={<MyReviews />}
                             />
 
                             <Route
@@ -77,14 +90,12 @@ function App() {
 
                     {/* Admin */}
                     <Route element={<AdminRoute />}>
-                        <Route
-                            path="/admin"
-                            element={
-                                <div>
-                                    <h1>Admin Dashboard</h1>
-                                </div>
-                            }
-                        />
+                        <Route element={<MainLayout />}>
+                            <Route
+                                path="/admin"
+                                element={<Admin />}
+                            />
+                        </Route>
                     </Route>
 
                 </Routes>

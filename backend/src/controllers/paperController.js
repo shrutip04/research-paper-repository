@@ -144,19 +144,20 @@ const createPaper = async (req, res) => {
             paper_type,
             file_url,
             area_id,
-            venue_id,
-            uploaded_by
+            venue_id
         } = req.body;
+
+        // Uploader always comes from the verified JWT, never the request body
+        const uploaded_by = req.user.user_id;
 
         if (
             !title ||
             !publication_year ||
-            !area_id ||
-            !uploaded_by
+            !area_id
         ) {
             return res.status(400).json({
                 success: false,
-                message: "title, publication_year, area_id and uploaded_by are required"
+                message: "title, publication_year and area_id are required"
             });
         }
 
@@ -227,6 +228,26 @@ const updatePaper = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "title, publication_year and area_id are required"
+            });
+        }
+
+        // Only the uploader or an ADMIN may edit a paper
+        const existing = await paperService.getPaperById(paperId);
+
+        if (!existing) {
+            return res.status(404).json({
+                success: false,
+                message: "Paper not found"
+            });
+        }
+
+        if (
+            req.user.role !== "ADMIN" &&
+            existing.uploaded_by !== req.user.user_id
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "You can only edit papers you uploaded"
             });
         }
 

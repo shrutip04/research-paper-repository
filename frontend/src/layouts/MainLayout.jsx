@@ -1,6 +1,9 @@
 import { NavLink, Outlet } from "react-router-dom";
 
+import { useAuth } from "../context/AuthContext";
+
 function MainLayout() {
+    const { user } = useAuth();
     return (
         <div className="app-layout">
 
@@ -32,16 +35,26 @@ function MainLayout() {
                         Bookmarks
                     </NavLink>
 
+                    <NavLink to="/reviews/me">
+                        My Reviews
+                    </NavLink>
+
                     <NavLink to="/analytics">
                         Analytics
                     </NavLink>
+
+                    {user?.role === "ADMIN" && (
+                        <NavLink to="/admin">
+                            Admin
+                        </NavLink>
+                    )}
 
                 </nav>
 
                 <div className="sidebar-bottom">
 
                     <NavLink to="/profile">
-                        Profile
+                        {user?.name || "Profile"}
                     </NavLink>
 
                 </div>

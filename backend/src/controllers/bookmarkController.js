@@ -11,6 +11,14 @@ const getUserBookmarks = async (req, res) => {
             });
         }
 
+        // Users may only read their own bookmarks (ADMIN may read any)
+        if (req.user.user_id !== userId && req.user.role !== "ADMIN") {
+            return res.status(403).json({
+                success: false,
+                message: "You can only view your own bookmarks"
+            });
+        }
+
         const bookmarks = await bookmarkService.getUserBookmarks(userId);
 
         res.status(200).json({

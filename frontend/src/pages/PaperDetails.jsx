@@ -5,21 +5,42 @@ import api from "../services/api";
 function PaperDetails() {
     const { id } = useParams();
 
+    // Paper
     const [paper, setPaper] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    // Bookmark
     const [bookmarked, setBookmarked] = useState(false);
     const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
+    // Downloads
     const [downloadCount, setDownloadCount] = useState(0);
     const [downloadLoading, setDownloadLoading] = useState(false);
 
+    // Citations
     const [citations, setCitations] = useState([]);
     const [citedBy, setCitedBy] = useState([]);
     const [citationStats, setCitationStats] = useState(null);
 
+    // Related Papers
     const [relatedPapers, setRelatedPapers] = useState([]);
+
+    // Impact indicator (application-defined, not an official academic metric)
+    const [impactScore, setImpactScore] = useState(null);
+
+    // Reviews
+    const [reviews, setReviews] = useState([]);
+    const [reviewSummary, setReviewSummary] = useState({
+        review_count: 0,
+        average_rating: 0,
+    });
+
+    const [reviewRating, setReviewRating] = useState(5);
+    const [reviewText, setReviewText] = useState("");
+    const [reviewLoading, setReviewLoading] = useState(false);
+    const [reviewError, setReviewError] = useState("");
+    const [reviewSuccess, setReviewSuccess] = useState("");
 
     useEffect(() => {
         const fetchPaper = async () => {
@@ -27,7 +48,10 @@ function PaperDetails() {
                 setLoading(true);
                 setError("");
 
-                // Fetch paper
+                // ==========================================
+                // FETCH PAPER
+                // ==========================================
+
                 const response = await api.get(`/papers/${id}`);
 
                 const data =
@@ -37,7 +61,10 @@ function PaperDetails() {
 
                 setPaper(data);
 
-                // Fetch download statistics
+                // ==========================================
+                // FETCH DOWNLOAD STATISTICS
+                // ==========================================
+
                 try {
                     const downloadResponse = await api.get(
                         `/papers/${id}/downloads`
@@ -52,7 +79,9 @@ function PaperDetails() {
                         setDownloadCount(downloadData.length);
                     } else if (typeof downloadData === "number") {
                         setDownloadCount(downloadData);
-                    } else if (downloadData?.count !== undefined) {
+                    } else if (
+                        downloadData?.count !== undefined
+                    ) {
                         setDownloadCount(downloadData.count);
                     }
                 } catch (downloadError) {
@@ -62,7 +91,10 @@ function PaperDetails() {
                     );
                 }
 
-                // Fetch citation information
+                // ==========================================
+                // FETCH CITATION INFORMATION
+                // ==========================================
+
                 try {
                     const [
                         citationsResponse,
@@ -106,7 +138,31 @@ function PaperDetails() {
                     );
                 }
 
-                // Fetch related papers
+                // ==========================================
+                // FETCH IMPACT INDICATOR
+                // ==========================================
+
+                try {
+                    const impactResponse = await api.get(
+                        `/papers/${id}/impact`
+                    );
+
+                    const impactData =
+                        impactResponse.data?.data?.impact_score ??
+                        impactResponse.data?.data;
+
+                    setImpactScore(impactData);
+                } catch (impactError) {
+                    console.error(
+                        "Error fetching impact indicator:",
+                        impactError
+                    );
+                }
+
+                // ==========================================
+                // FETCH RELATED PAPERS
+                // ==========================================
+
                 try {
                     const relatedResponse = await api.get(
                         `/papers/${id}/related`
@@ -126,6 +182,38 @@ function PaperDetails() {
                         relatedError
                     );
                 }
+
+                // ==========================================
+                // FETCH REVIEWS
+                // ==========================================
+
+                try {
+                    const reviewsResponse = await api.get(
+                        `/papers/${id}/reviews`
+                    );
+
+                    const reviewsData =
+                        reviewsResponse.data?.data ||
+                        reviewsResponse.data?.reviews ||
+                        [];
+
+                    const summaryData =
+                        reviewsResponse.data?.summary || {
+                            review_count: 0,
+                            average_rating: 0,
+                        };
+
+                    if (Array.isArray(reviewsData)) {
+                        setReviews(reviewsData);
+                    }
+
+                    setReviewSummary(summaryData);
+                } catch (reviewFetchError) {
+                    console.error(
+                        "Error fetching reviews:",
+                        reviewFetchError
+                    );
+                }
             } catch (err) {
                 console.error("Error fetching paper:", err);
 
@@ -140,6 +228,10 @@ function PaperDetails() {
 
         fetchPaper();
     }, [id]);
+
+    // ==========================================
+    // BOOKMARK
+    // ==========================================
 
     const handleBookmark = async () => {
         try {
@@ -163,19 +255,111 @@ function PaperDetails() {
         }
     };
 
+    // ==========================================
+    // DOWNLOAD
+    // ==========================================
+
     const handleDownload = async () => {
         try {
             setDownloadLoading(true);
 
             await api.post(`/papers/${id}/download`);
 
-            setDownloadCount((previousCount) => previousCount + 1);
+            setDownloadCount(
+                (previousCount) => previousCount + 1
+            );
         } catch (err) {
             console.error("Download error:", err);
         } finally {
             setDownloadLoading(false);
         }
     };
+
+    // ==========================================
+    // SUBMIT REVIEW
+    // ==========================================
+
+    const handleReviewSubmit = async (event) => {
+        event.preventDefault();
+
+        try {
+            setReviewLoading(true);
+            setReviewError("");
+            setReviewSuccess("");
+
+            const response = await api.post(
+                `/papers/${id}/reviews`,
+                {
+                    rating: Number(reviewRating),
+                    comment: reviewText,
+                }
+            );
+
+            const newReview =
+                response.data?.data ||
+                response.data;
+
+            setReviews((previousReviews) => [
+                newReview,
+                ...previousReviews,
+            ]);
+
+            setReviewText("");
+            setReviewRating(5);
+
+            setReviewSuccess(
+                "Review submitted successfully."
+            );
+
+            // Refresh review summary
+            const reviewsResponse = await api.get(
+                `/papers/${id}/reviews`
+            );
+
+            const reviewsData =
+                reviewsResponse.data?.data ||
+                reviewsResponse.data?.reviews ||
+                [];
+
+            const summaryData =
+                reviewsResponse.data?.summary || {
+                    review_count: 0,
+                    average_rating: 0,
+                };
+
+            if (Array.isArray(reviewsData)) {
+                setReviews(reviewsData);
+            }
+
+            setReviewSummary(summaryData);
+        } catch (err) {
+            console.error(
+                "Review submission error:",
+                err
+            );
+
+            if (err.response?.status === 401) {
+                setReviewError(
+                    "Please log in to submit a review."
+                );
+            } else if (err.response?.status === 409) {
+                setReviewError(
+                    "You have already reviewed this paper."
+                );
+            } else {
+                setReviewError(
+                    err.response?.data?.message ||
+                    "Failed to submit review."
+                );
+            }
+        } finally {
+            setReviewLoading(false);
+        }
+    };
+
+    // ==========================================
+    // LOADING STATE
+    // ==========================================
 
     if (loading) {
         return (
@@ -187,6 +371,10 @@ function PaperDetails() {
         );
     }
 
+    // ==========================================
+    // ERROR STATE
+    // ==========================================
+
     if (error) {
         return (
             <div className="page-container">
@@ -194,12 +382,19 @@ function PaperDetails() {
                     {error}
                 </div>
 
-                <Link to="/discover" className="back-link">
+                <Link
+                    to="/discover"
+                    className="back-link"
+                >
                     ← Back to Discover
                 </Link>
             </div>
         );
     }
+
+    // ==========================================
+    // PAPER NOT FOUND
+    // ==========================================
 
     if (!paper) {
         return (
@@ -208,7 +403,10 @@ function PaperDetails() {
                     Paper not found.
                 </div>
 
-                <Link to="/discover" className="back-link">
+                <Link
+                    to="/discover"
+                    className="back-link"
+                >
                     ← Back to Discover
                 </Link>
             </div>
@@ -218,18 +416,26 @@ function PaperDetails() {
     return (
         <div className="page-container">
 
-            <Link to="/discover" className="back-link">
+            {/* Back */}
+            <Link
+                to="/discover"
+                className="back-link"
+            >
                 ← Back to Discover
             </Link>
 
             <div className="paper-details-card">
 
-                {/* Paper Header */}
+                {/* ======================================
+                    PAPER HEADER
+                ====================================== */}
+
                 <div className="paper-details-header">
 
                     <div>
                         <span className="paper-type-badge">
-                            {paper.paper_type || "Research Paper"}
+                            {paper.paper_type ||
+                                "Research Paper"}
                         </span>
 
                         <h1>{paper.title}</h1>
@@ -265,7 +471,10 @@ function PaperDetails() {
 
                 </div>
 
-                {/* Paper Metadata */}
+                {/* ======================================
+                    PAPER METADATA
+                ====================================== */}
+
                 <div className="paper-meta">
 
                     <span>
@@ -292,7 +501,10 @@ function PaperDetails() {
 
                 </div>
 
-                {/* Abstract */}
+                {/* ======================================
+                    ABSTRACT
+                ====================================== */}
+
                 {paper.abstract && (
                     <section className="paper-section">
 
@@ -305,7 +517,10 @@ function PaperDetails() {
                     </section>
                 )}
 
-                {/* Paper Information */}
+                {/* ======================================
+                    PAPER INFORMATION
+                ====================================== */}
+
                 <section className="paper-section">
 
                     <h2>Paper Information</h2>
@@ -314,7 +529,10 @@ function PaperDetails() {
 
                         {paper.research_area_name && (
                             <div>
-                                <strong>Research Area</strong>
+                                <strong>
+                                    Research Area
+                                </strong>
+
                                 <span>
                                     {paper.research_area_name}
                                 </span>
@@ -323,7 +541,10 @@ function PaperDetails() {
 
                         {paper.paper_type && (
                             <div>
-                                <strong>Paper Type</strong>
+                                <strong>
+                                    Paper Type
+                                </strong>
+
                                 <span>
                                     {paper.paper_type}
                                 </span>
@@ -332,7 +553,10 @@ function PaperDetails() {
 
                         {paper.publication_year && (
                             <div>
-                                <strong>Publication Year</strong>
+                                <strong>
+                                    Publication Year
+                                </strong>
+
                                 <span>
                                     {paper.publication_year}
                                 </span>
@@ -341,7 +565,10 @@ function PaperDetails() {
 
                         {paper.doi && (
                             <div>
-                                <strong>DOI</strong>
+                                <strong>
+                                    DOI
+                                </strong>
+
                                 <span>
                                     {paper.doi}
                                 </span>
@@ -352,12 +579,17 @@ function PaperDetails() {
 
                 </section>
 
-                {/* Citation Network */}
+                {/* ======================================
+                    CITATION NETWORK
+                ====================================== */}
+
                 <section className="paper-section">
 
                     <div className="citation-header">
 
-                        <h2>Citation Network</h2>
+                        <h2>
+                            Citation Network
+                        </h2>
 
                         <div className="citation-stats">
 
@@ -389,6 +621,16 @@ function PaperDetails() {
 
                             </div>
 
+                            {impactScore !== null && (
+                                <div
+                                    className="citation-stat"
+                                    title="Application-defined ResearchSphere indicator, not an official academic metric"
+                                >
+                                    <strong>{impactScore}</strong>
+                                    <span>Impact Score</span>
+                                </div>
+                            )}
+
                         </div>
 
                     </div>
@@ -396,6 +638,7 @@ function PaperDetails() {
                     <div className="citation-columns">
 
                         {/* Papers This Paper Cites */}
+
                         <div>
 
                             <h3>
@@ -448,6 +691,7 @@ function PaperDetails() {
                         </div>
 
                         {/* Papers Citing This Paper */}
+
                         <div>
 
                             <h3>
@@ -456,7 +700,8 @@ function PaperDetails() {
 
                             {citedBy.length === 0 ? (
                                 <p className="empty-text">
-                                    No papers currently cite this paper.
+                                    No papers currently cite
+                                    this paper.
                                 </p>
                             ) : (
                                 <div className="citation-list">
@@ -503,12 +748,17 @@ function PaperDetails() {
 
                 </section>
 
-                {/* Related Research */}
+                {/* ======================================
+                    RELATED RESEARCH
+                ====================================== */}
+
                 <section className="paper-section related-section">
 
                     <div className="section-header">
 
-                        <h2>Related Research</h2>
+                        <h2>
+                            Related Research
+                        </h2>
 
                         <p>
                             Discover papers connected through
@@ -524,60 +774,269 @@ function PaperDetails() {
                     ) : (
                         <div className="related-grid">
 
-                            {relatedPapers.map((related) => (
+                            {relatedPapers.map(
+                                (related) => (
+                                    <div
+                                        className="related-card"
+                                        key={related.paper_id}
+                                    >
+
+                                        <span className="paper-type-badge">
+                                            {related.paper_type ||
+                                                "Research Paper"}
+                                        </span>
+
+                                        <h3>
+                                            {related.title}
+                                        </h3>
+
+                                        <p className="related-meta">
+                                            {related.area_name ||
+                                                "Research Area"}
+
+                                            {related.publication_year &&
+                                                ` • ${related.publication_year}`}
+                                        </p>
+
+                                        <div className="related-stats">
+
+                                            <span>
+                                                🔑 Shared Keywords:{" "}
+                                                {related.shared_keywords}
+                                            </span>
+
+                                            <span>
+                                                👥 Shared Authors:{" "}
+                                                {related.shared_authors}
+                                            </span>
+
+                                            <span>
+                                                ⭐ Relevance:{" "}
+                                                {related.relevance_score}
+                                            </span>
+
+                                        </div>
+
+                                        <Link
+                                            to={`/papers/${related.paper_id}`}
+                                            className="view-paper-button"
+                                        >
+                                            View Paper →
+                                        </Link>
+
+                                    </div>
+                                )
+                            )}
+
+                        </div>
+                    )}
+
+                </section>
+
+                {/* ======================================
+                    REVIEWS & RATINGS
+                ====================================== */}
+
+                <section className="paper-section reviews-section">
+
+                    <div className="section-header">
+
+                        <h2>
+                            Reviews & Ratings
+                        </h2>
+
+                        <p>
+                            See what researchers think about
+                            this paper.
+                        </p>
+
+                    </div>
+
+                    {/* Rating Summary */}
+
+                    <div className="review-summary">
+
+                        <div className="rating-summary-main">
+
+                            <strong>
+                                {Number(
+                                    reviewSummary.average_rating || 0
+                                ).toFixed(1)}
+                            </strong>
+
+                            <div className="rating-stars">
+                                {"★".repeat(
+                                    Math.round(
+                                        Number(
+                                            reviewSummary.average_rating ||
+                                            0
+                                        )
+                                    )
+                                )}
+                            </div>
+
+                            <span>
+                                {reviewSummary.review_count || 0}{" "}
+                                reviews
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    {/* Add Review */}
+
+                    <div className="review-form-card">
+
+                        <h3>
+                            Write a Review
+                        </h3>
+
+                        <form
+                            onSubmit={handleReviewSubmit}
+                        >
+
+                            <label htmlFor="review-rating">
+                                Rating
+                            </label>
+
+                            <select
+                                id="review-rating"
+                                value={reviewRating}
+                                onChange={(event) =>
+                                    setReviewRating(
+                                        event.target.value
+                                    )
+                                }
+                                disabled={reviewLoading}
+                            >
+                                <option value="5">
+                                    ★★★★★ — 5
+                                </option>
+
+                                <option value="4">
+                                    ★★★★☆ — 4
+                                </option>
+
+                                <option value="3">
+                                    ★★★☆☆ — 3
+                                </option>
+
+                                <option value="2">
+                                    ★★☆☆☆ — 2
+                                </option>
+
+                                <option value="1">
+                                    ★☆☆☆☆ — 1
+                                </option>
+                            </select>
+
+                            <label htmlFor="review-text">
+                                Review
+                            </label>
+
+                            <textarea
+                                id="review-text"
+                                value={reviewText}
+                                onChange={(event) =>
+                                    setReviewText(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="Share your thoughts about this paper..."
+                                rows="4"
+                                disabled={reviewLoading}
+                            />
+
+                            {reviewError && (
+                                <p className="review-error">
+                                    {reviewError}
+                                </p>
+                            )}
+
+                            {reviewSuccess && (
+                                <p className="review-success">
+                                    {reviewSuccess}
+                                </p>
+                            )}
+
+                            <button
+                                type="submit"
+                                className="submit-review-button"
+                                disabled={reviewLoading}
+                            >
+                                {reviewLoading
+                                    ? "Submitting..."
+                                    : "Submit Review"}
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                    {/* Existing Reviews */}
+
+                    <div className="reviews-list">
+
+                        <h3>
+                            Reader Reviews
+                        </h3>
+
+                        {reviews.length === 0 ? (
+                            <p className="empty-text">
+                                No reviews yet. Be the first
+                                to review this paper.
+                            </p>
+                        ) : (
+                            reviews.map((review) => (
                                 <div
-                                    className="related-card"
-                                    key={related.paper_id}
+                                    className="review-card"
+                                    key={review.review_id}
                                 >
 
-                                    <span className="paper-type-badge">
-                                        {related.paper_type ||
-                                            "Research Paper"}
-                                    </span>
+                                    <div className="review-card-header">
 
-                                    <h3>
-                                        {related.title}
-                                    </h3>
+                                        <strong>
+                                            {review.reviewer_name ||
+                                                "Anonymous Researcher"}
+                                        </strong>
 
-                                    <p className="related-meta">
-                                        {related.area_name ||
-                                            "Research Area"}
+                                        <span className="review-rating">
+                                            {"★".repeat(
+                                                Number(
+                                                    review.rating
+                                                )
+                                            )}
 
-                                        {related.publication_year &&
-                                            ` • ${related.publication_year}`}
-                                    </p>
-
-                                    <div className="related-stats">
-
-                                        <span>
-                                            🔑 Shared Keywords:{" "}
-                                            {related.shared_keywords}
-                                        </span>
-
-                                        <span>
-                                            👥 Shared Authors:{" "}
-                                            {related.shared_authors}
-                                        </span>
-
-                                        <span>
-                                            ⭐ Relevance:{" "}
-                                            {related.relevance_score}
+                                            {"☆".repeat(
+                                                5 -
+                                                Number(
+                                                    review.rating
+                                                )
+                                            )}
                                         </span>
 
                                     </div>
 
-                                    <Link
-                                        to={`/papers/${related.paper_id}`}
-                                        className="view-paper-button"
-                                    >
-                                        View Paper →
-                                    </Link>
+                                    {review.comment && (
+                                        <p>
+                                            {review.comment}
+                                        </p>
+                                    )}
+
+                                    {review.created_at && (
+                                        <span className="review-date">
+                                            {new Date(
+                                                review.created_at
+                                            ).toLocaleDateString()}
+                                        </span>
+                                    )}
 
                                 </div>
-                            ))}
+                            ))
+                        )}
 
-                        </div>
-                    )}
+                    </div>
 
                 </section>
 
