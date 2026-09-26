@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import SpotlightCard from "../reactbits/SpotlightCard/SpotlightCard";
+import { FileSearch, Quote, Download, Star } from "lucide-react";
 
 function Discover() {
     const [papers, setPapers] = useState([]);
@@ -237,7 +239,7 @@ function Discover() {
                 </div>
             ) : papers.length === 0 ? (
                 <div className="empty-discover">
-                    <div className="empty-icon">📄</div>
+                    <div className="empty-icon"><FileSearch size={32} /></div>
                     <h3>No papers found</h3>
                     <p>
                         Try changing your search or filters.
@@ -267,8 +269,9 @@ function Discover() {
                             "";
 
                         return (
-                            <article
+                            <SpotlightCard
                                 className="paper-card"
+                                spotlightColor="rgba(23, 32, 51, 0.07)"
                                 key={paperId ?? index}
                             >
 
@@ -333,7 +336,7 @@ function Discover() {
                                         <div className="paper-stats">
 
                                             <span>
-                                                🔗{" "}
+                                                <Quote size={13} />
                                                 {paper.citations_count ??
                                                     paper.citation_count ??
                                                     paper.citations ??
@@ -341,7 +344,7 @@ function Discover() {
                                             </span>
 
                                             <span>
-                                                ⬇{" "}
+                                                <Download size={13} />
                                                 {paper.downloads_count ??
                                                     paper.download_count ??
                                                     paper.downloads ??
@@ -349,7 +352,7 @@ function Discover() {
                                             </span>
 
                                             <span>
-                                                ⭐{" "}
+                                                <Star size={13} className="icon-star" />
                                                 {paper.average_rating ??
                                                     paper.rating ??
                                                     "—"}
@@ -370,7 +373,7 @@ function Discover() {
 
                                 </div>
 
-                            </article>
+                            </SpotlightCard>
                         );
                     })}
 

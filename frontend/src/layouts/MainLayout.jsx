@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
+import ShinyText from "../reactbits/ShinyText/ShinyText";
 
 function MainLayout() {
     const { user } = useAuth();
@@ -10,7 +11,12 @@ function MainLayout() {
             <aside className="sidebar">
 
                 <div className="sidebar-logo">
-                    ResearchSphere
+                    <ShinyText
+                        text="ResearchSphere"
+                        speed={4}
+                        color="#aab2c4"
+                        shineColor="#ffffff"
+                    />
                 </div>
 
                 <nav className="sidebar-nav">

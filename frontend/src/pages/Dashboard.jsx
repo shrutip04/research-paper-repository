@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
+import SpotlightCard from "../reactbits/SpotlightCard/SpotlightCard";
+import CountUp from "../reactbits/CountUp/CountUp";
+import { FileText, Users, Quote, Download } from "lucide-react";
 
 function Dashboard() {
     const { user } = useAuth();
@@ -103,7 +106,7 @@ function Dashboard() {
                     <p className="eyebrow">RESEARCH WORKSPACE</p>
 
                     <h1>
-                        Welcome back{user?.email ? `, ${user.email}` : ""} 👋
+                        Welcome back{user?.email ? `, ${user.email}` : ""}
                     </h1>
 
                     <p className="hero-subtitle">
@@ -131,34 +134,34 @@ function Dashboard() {
             <section className="stats-grid">
 
                 <div className="stat-card">
-                    <div className="stat-icon">📄</div>
+                    <div className="stat-icon"><FileText size={20} /></div>
                     <div>
                         <p>Total Papers</p>
-                        <h2>{papers.length}</h2>
+                        <h2><CountUp to={papers.length} duration={1.2} /></h2>
                     </div>
                 </div>
 
                 <div className="stat-card">
-                    <div className="stat-icon">👥</div>
+                    <div className="stat-icon"><Users size={20} /></div>
                     <div>
                         <p>Total Authors</p>
-                        <h2>{authors.length}</h2>
+                        <h2><CountUp to={authors.length} duration={1.2} /></h2>
                     </div>
                 </div>
 
                 <div className="stat-card">
-                    <div className="stat-icon">🔗</div>
+                    <div className="stat-icon"><Quote size={20} /></div>
                     <div>
                         <p>Total Citations</p>
-                        <h2>{totalCitations}</h2>
+                        <h2><CountUp to={totalCitations} duration={1.2} /></h2>
                     </div>
                 </div>
 
                 <div className="stat-card">
-                    <div className="stat-icon">⬇</div>
+                    <div className="stat-icon"><Download size={20} /></div>
                     <div>
                         <p>Total Downloads</p>
-                        <h2>{totalDownloads}</h2>
+                        <h2><CountUp to={totalDownloads} duration={1.2} /></h2>
                     </div>
                 </div>
 
@@ -186,8 +189,9 @@ function Dashboard() {
                             </div>
                         ) : (
                             recentPapers.map((paper, index) => (
-                                <div
+                                <SpotlightCard
                                     className="dashboard-paper"
+                                    spotlightColor="rgba(23, 32, 51, 0.07)"
                                     key={
                                         paper.paper_id ??
                                         paper.id ??
@@ -219,7 +223,7 @@ function Dashboard() {
 
                                         <div className="paper-metrics">
                                             <span>
-                                                🔗{" "}
+                                                <Quote size={13} />
                                                 {paper.citations_count ??
                                                     paper.citation_count ??
                                                     paper.citations ??
@@ -228,7 +232,7 @@ function Dashboard() {
                                             </span>
 
                                             <span>
-                                                ⬇{" "}
+                                                <Download size={13} />
                                                 {paper.downloads_count ??
                                                     paper.download_count ??
                                                     paper.downloads ??
@@ -253,7 +257,7 @@ function Dashboard() {
                                     >
                                         View
                                     </button>
-                                </div>
+                                </SpotlightCard>
                             ))
                         )}
 

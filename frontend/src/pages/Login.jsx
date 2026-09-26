@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import AuthLayout from "../components/AuthLayout";
 
 function Login() {
     const navigate = useNavigate();
@@ -41,14 +42,10 @@ function Login() {
     };
 
     return (
-        <div className="auth-page">
-            <div className="auth-card">
-                <h1>ResearchSphere</h1>
-
-                <p className="auth-subtitle">
-                    Sign in to your research workspace
-                </p>
-
+        <AuthLayout
+            title="Welcome back"
+            subtitle="Sign in to your research workspace"
+        >
                 {error && (
                     <div className="error-message">
                         {error}
@@ -87,8 +84,7 @@ function Login() {
                     Don't have an account?{" "}
                     <Link to="/register">Create one</Link>
                 </p>
-            </div>
-        </div>
+        </AuthLayout>
     );
 }
 

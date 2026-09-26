@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import AuthLayout from "../components/AuthLayout";
 
 function Register() {
     const navigate = useNavigate();
@@ -52,14 +53,10 @@ function Register() {
     };
 
     return (
-        <div className="auth-page">
-            <div className="auth-card">
-                <h1>Create Account</h1>
-
-                <p className="auth-subtitle">
-                    Join ResearchSphere
-                </p>
-
+        <AuthLayout
+            title="Create your account"
+            subtitle="Join ResearchSphere"
+        >
                 {error && (
                     <div className="error-message">
                         {error}
@@ -135,8 +132,7 @@ function Register() {
                     Already have an account?{" "}
                     <Link to="/login">Sign in</Link>
                 </p>
-            </div>
-        </div>
+        </AuthLayout>
     );
 }
 

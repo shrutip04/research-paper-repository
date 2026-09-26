@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import api from "../services/api";
 import Page from "../components/Page";
+import CountUp from "../reactbits/CountUp/CountUp";
 
 function Admin() {
     const [stats, setStats] = useState(null);
@@ -56,7 +57,14 @@ function Admin() {
             <section className="stats-grid">
                 {cards.map(([label, value]) => (
                     <div className="stat-card" key={label}>
-                        <div><p>{label}</p><h2>{value}</h2></div>
+                        <div>
+                            <p>{label}</p>
+                            <h2>
+                                {typeof value === "number" || /^\d+(\.\d+)?$/.test(String(value))
+                                    ? <CountUp to={Number(value)} duration={1.2} />
+                                    : value}
+                            </h2>
+                        </div>
                     </div>
                 ))}
             </section>

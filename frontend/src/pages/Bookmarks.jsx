@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import Page from "../components/Page";
+import SpotlightCard from "../reactbits/SpotlightCard/SpotlightCard";
 
 function Bookmarks() {
     const { user } = useAuth();
@@ -54,7 +55,7 @@ function Bookmarks() {
             ) : (
                 <div className="paper-list">
                     {bookmarks.map((b) => (
-                        <div className="paper-card" key={b.bookmark_id}>
+                        <SpotlightCard className="paper-card" spotlightColor="rgba(23, 32, 51, 0.07)" key={b.bookmark_id}>
                             <div className="paper-card-content">
                                 <div className="paper-card-top">
                                     <span className="paper-type">{b.paper_type}</span>
@@ -78,7 +79,7 @@ function Bookmarks() {
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </SpotlightCard>
                     ))}
                 </div>
             )}

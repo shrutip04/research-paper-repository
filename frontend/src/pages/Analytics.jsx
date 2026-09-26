@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import api from "../services/api";
 import Page from "../components/Page";
 import BarList from "../components/BarList";
+import CountUp from "../reactbits/CountUp/CountUp";
 
 const num = (v) => Number(v) || 0;
 
@@ -58,10 +59,10 @@ function Analytics() {
             error={error}
         >
             <section className="stats-grid">
-                <div className="stat-card"><div><p>Papers</p><h2>{papers.length}</h2></div></div>
-                <div className="stat-card"><div><p>Research Areas</p><h2>{areas.length}</h2></div></div>
-                <div className="stat-card"><div><p>Citations</p><h2>{totalCitations}</h2></div></div>
-                <div className="stat-card"><div><p>Downloads</p><h2>{totalDownloads}</h2></div></div>
+                <div className="stat-card"><div><p>Papers</p><h2><CountUp to={papers.length} duration={1.2} /></h2></div></div>
+                <div className="stat-card"><div><p>Research Areas</p><h2><CountUp to={areas.length} duration={1.2} /></h2></div></div>
+                <div className="stat-card"><div><p>Citations</p><h2><CountUp to={totalCitations} duration={1.2} /></h2></div></div>
+                <div className="stat-card"><div><p>Downloads</p><h2><CountUp to={totalDownloads} duration={1.2} /></h2></div></div>
                 <div className="stat-card"><div><p>Avg. Rating</p><h2>{avgRating}</h2></div></div>
             </section>
 

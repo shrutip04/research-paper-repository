@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../services/api";
+import {
+    Bookmark,
+    BookmarkCheck,
+    Download,
+    Calendar,
+    Building2,
+    Tag,
+    Users,
+    Star,
+} from "lucide-react";
+import Stars from "../components/Stars";
 
 function PaperDetails() {
     const { id } = useParams();
@@ -447,13 +458,19 @@ function PaperDetails() {
                             type="button"
                             onClick={handleBookmark}
                             disabled={bookmarkLoading}
-                            className="bookmark-button"
+                            className={`bookmark-button${bookmarked ? " is-bookmarked" : ""}`}
                         >
-                            {bookmarkLoading
-                                ? "Saving..."
-                                : bookmarked
-                                    ? "🔖 Bookmarked"
-                                    : "🔖 Bookmark"}
+                            {bookmarkLoading ? (
+                                "Saving..."
+                            ) : bookmarked ? (
+                                <>
+                                    <BookmarkCheck size={15} /> Bookmarked
+                                </>
+                            ) : (
+                                <>
+                                    <Bookmark size={15} /> Bookmark
+                                </>
+                        )}
                         </button>
 
                         <button
@@ -462,9 +479,13 @@ function PaperDetails() {
                             disabled={downloadLoading}
                             className="download-button"
                         >
-                            {downloadLoading
-                                ? "Recording..."
-                                : "⬇️ Download"}
+                            {downloadLoading ? (
+                                "Recording..."
+                            ) : (
+                                <>
+                                    <Download size={15} /> Download
+                                </>
+                    )}
                         </button>
 
                     </div>
@@ -478,18 +499,18 @@ function PaperDetails() {
                 <div className="paper-meta">
 
                     <span>
-                        ⬇️ {downloadCount} downloads
+                        <Download size={14} /> {downloadCount} downloads
                     </span>
 
                     {paper.publication_year && (
                         <span>
-                            📅 {paper.publication_year}
+                        <Calendar size={14} /> {paper.publication_year}
                         </span>
                     )}
 
                     {paper.venue_name && (
                         <span>
-                            🏛️ {paper.venue_name}
+                            <Building2 size={14} /> {paper.venue_name}
                         </span>
                     )}
 
@@ -801,17 +822,17 @@ function PaperDetails() {
                                         <div className="related-stats">
 
                                             <span>
-                                                🔑 Shared Keywords:{" "}
+                                                <Tag size={13} /> Shared Keywords:{" "}
                                                 {related.shared_keywords}
                                             </span>
 
                                             <span>
-                                                👥 Shared Authors:{" "}
+                                                <Users size={13} /> Shared Authors:{" "}
                                                 {related.shared_authors}
                                             </span>
 
                                             <span>
-                                                ⭐ Relevance:{" "}
+                                                <Star size={13} /> Relevance:{" "}
                                                 {related.relevance_score}
                                             </span>
 
@@ -865,14 +886,10 @@ function PaperDetails() {
                             </strong>
 
                             <div className="rating-stars">
-                                {"★".repeat(
-                                    Math.round(
-                                        Number(
-                                            reviewSummary.average_rating ||
-                                            0
-                                        )
-                                    )
-                                )}
+                                <Stars
+                                    rating={Number(reviewSummary.average_rating || 0)}
+                                    size={18}
+                                />
                             </div>
 
                             <span>
@@ -1001,20 +1018,7 @@ function PaperDetails() {
                                                 "Anonymous Researcher"}
                                         </strong>
 
-                                        <span className="review-rating">
-                                            {"★".repeat(
-                                                Number(
-                                                    review.rating
-                                                )
-                                            )}
-
-                                            {"☆".repeat(
-                                                5 -
-                                                Number(
-                                                    review.rating
-                                                )
-                                            )}
-                                        </span>
+                                        <Stars rating={review.rating} />
 
                                     </div>
 

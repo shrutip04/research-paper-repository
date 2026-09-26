@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Pencil, Check, X } from "lucide-react";
 
 import api from "../services/api";
 import Page from "../components/Page";
 import Stars from "../components/Stars";
+import SpotlightCard from "../reactbits/SpotlightCard/SpotlightCard";
 
 function MyReviews() {
     const [reviews, setReviews] = useState([]);
@@ -63,32 +65,55 @@ function MyReviews() {
             ) : (
                 <div className="paper-list">
                     {reviews.map((r) => (
-                        <div className="paper-card" key={r.review_id}>
+                        <SpotlightCard
+                            className="paper-card"
+                            spotlightColor="rgba(23, 32, 51, 0.07)"
+                            key={r.review_id}
+                        >
                             <div className="paper-card-content">
                                 <h3>
                                     <Link to={`/papers/${r.paper_id}`}>{r.paper_title}</Link>
                                 </h3>
 
                                 {editing?.id === r.review_id ? (
-                                    <>
+                                    <div className="review-edit-form">
+                                        <label htmlFor={`rating-${r.review_id}`}>
+                                            Your rating
+                                        </label>
+
                                         <select
+                                            id={`rating-${r.review_id}`}
+                                            className="review-edit-select"
                                             value={editing.rating}
                                             onChange={(e) => setEditing({ ...editing, rating: e.target.value })}
                                         >
                                             {[5, 4, 3, 2, 1].map((n) => (
-                                                <option key={n} value={n}>{n} ★</option>
+                                                <option key={n} value={n}>{n} ★ — {n === 5 ? "Excellent" : n === 4 ? "Good" : n === 3 ? "Average" : n === 2 ? "Below average" : "Poor"}</option>
                                             ))}
                                         </select>
+
+                                        <label htmlFor={`comment-${r.review_id}`}>
+                                            Your comment
+                                        </label>
+
                                         <textarea
+                                            id={`comment-${r.review_id}`}
+                                            className="review-edit-textarea"
                                             rows={3}
+                                            placeholder="Share your thoughts on this paper..."
                                             value={editing.comment || ""}
                                             onChange={(e) => setEditing({ ...editing, comment: e.target.value })}
                                         />
+
                                         <div className="paper-actions">
-                                            <button type="button" className="primary-button" onClick={save}>Save</button>
-                                            <button type="button" className="secondary-button" onClick={() => setEditing(null)}>Cancel</button>
+                                            <button type="button" className="primary-button" onClick={save}>
+                                                <Check size={15} /> Save
+                                            </button>
+                                            <button type="button" className="secondary-button" onClick={() => setEditing(null)}>
+                                                <X size={15} /> Cancel
+                                            </button>
                                         </div>
-                                    </>
+                                    </div>
                                 ) : (
                                     <>
                                         <Stars rating={r.rating} />
@@ -100,13 +125,13 @@ function MyReviews() {
                                                 className="secondary-button"
                                                 onClick={() => setEditing({ id: r.review_id, rating: r.rating, comment: r.comment })}
                                             >
-                                                Edit
+                                                <Pencil size={13} /> Edit
                                             </button>
                                         </div>
                                     </>
                                 )}
                             </div>
-                        </div>
+                        </SpotlightCard>
                     ))}
                 </div>
             )}
