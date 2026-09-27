@@ -1,6 +1,6 @@
 <div align="center">
 
-![Header](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=24,2,6,20&height=220&section=header&text=ResearchSphere&fontSize=56&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Research%20Paper%20Repository%20%26%20Discovery%20System&descAlignY=58&descSize=18)
+![Header](docs/assets/banner.svg)
 
 [![Typing SVG](https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=500&size=20&pause=1000&color=5A82D2&center=true&vCenter=true&width=600&lines=PostgreSQL+%2B+Express+%2B+React;Advanced+SQL+%C2%B7+Auth+%2F+RBAC+%C2%B7+Analytics;Built+for+DBMS+%2B+Full-Stack+Coursework)](https://git.io/typing-svg)
 
