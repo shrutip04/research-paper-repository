@@ -84,9 +84,74 @@ const getAuthorCollaborations = async (authorId) => {
     return result.rows;
 };
 
+// ==========================================
+// ATTACH AUTHORS TO A PAPER (paper_authors)
+// ==========================================
+
+const addPaperAuthors = async (paperId, authorIds) => {
+    // author_order reflects the order the frontend submitted them in
+    const values = [];
+    const rows = authorIds.map((authorId, index) => {
+        const offset = values.length;
+        values.push(paperId, authorId, index + 1);
+        return `($${offset + 1}, $${offset + 2}, $${offset + 3})`;
+    });
+
+    const query = `
+        INSERT INTO paper_authors (paper_id, author_id, author_order)
+        VALUES ${rows.join(", ")}
+        ON CONFLICT (paper_id, author_id) DO NOTHING
+        RETURNING paper_id, author_id, author_order;
+    `;
+
+    const result = await pool.query(query, values);
+
+    return result.rows;
+};
+
+// ==========================================
+// CREATE A NEW AUTHOR
+// (used by the paper submission form's
+// "add a new author" quick-add)
+// ==========================================
+
+const createAuthor = async (authorData) => {
+    const query = `
+        INSERT INTO authors (
+            name,
+            email,
+            affiliation,
+            department,
+            bio
+        )
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING
+            author_id,
+            name,
+            email,
+            affiliation,
+            department,
+            bio;
+    `;
+
+    const values = [
+        authorData.name,
+        authorData.email || null,
+        authorData.affiliation || null,
+        authorData.department || null,
+        authorData.bio || null
+    ];
+
+    const result = await pool.query(query, values);
+
+    return result.rows[0];
+};
+
 module.exports = {
     getAllAuthors,
     getAuthorById,
     getAuthorPapers,
-    getAuthorCollaborations
+    getAuthorCollaborations,
+    addPaperAuthors,
+    createAuthor
 };

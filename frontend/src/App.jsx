@@ -20,6 +20,7 @@ import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
 import PaperDetails from "./pages/PaperDetails";
 import Admin from "./pages/Admin";
+import SubmitPaper from "./pages/SubmitPaper";
 
 function App() {
     return (
@@ -83,6 +84,11 @@ function App() {
                             <Route 
                                 path="/papers/:id" 
                                 element={<PaperDetails />} 
+                            />
+
+                            <Route
+                                path="/submit"
+                                element={<SubmitPaper />}
                             />
 
                         </Route>

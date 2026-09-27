@@ -42,7 +42,33 @@ const getKeywordPapers = async (keywordId) => {
     return result.rows;
 };
 
+// ==========================================
+// ATTACH KEYWORDS TO A PAPER (paper_keywords)
+// ==========================================
+
+const addPaperKeywords = async (paperId, keywordIds) => {
+    const values = [];
+    const rows = keywordIds.map((keywordId) => {
+        const offset = values.length;
+        values.push(paperId, keywordId);
+        return `($${offset + 1}, $${offset + 2})`;
+    });
+
+    const query = `
+        INSERT INTO paper_keywords (paper_id, keyword_id)
+        VALUES ${rows.join(", ")}
+        ON CONFLICT (paper_id, keyword_id) DO NOTHING
+        RETURNING paper_id, keyword_id;
+    `;
+
+    const result = await pool.query(query, values);
+
+    return result.rows;
+};
+
+
 module.exports = {
     getAllKeywords,
-    getKeywordPapers
+    getKeywordPapers,
+    addPaperKeywords
 };

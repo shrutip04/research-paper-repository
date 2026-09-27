@@ -1,5 +1,8 @@
 const paperService = require("../services/paperService");
 
+const authorService = require("../services/authorService");
+const keywordService = require("../services/keywordService");
+
 const getAllPapers = async (req, res) => {
     try {
         const { area, year, paper_type } = req.query;
@@ -161,15 +164,23 @@ const createPaper = async (req, res) => {
             });
         }
 
+                // multer (multipart form) puts the uploaded PDF on req.file and
+        // parses every other field as a string -- coerce the numeric ones.
+        // If no file was attached, fall back to a plain file_url string
+        // (kept for API/Postman testing without a real upload).
+        const resolvedFileUrl = req.file
+            ? `/uploads/papers/${req.file.filename}`
+            : (file_url || null);
+
         const paper = await paperService.createPaper({
             title,
             abstract,
-            publication_year,
+            publication_year: Number(publication_year),
             doi,
             paper_type,
-            file_url,
-            area_id,
-            venue_id,
+            file_url: resolvedFileUrl,
+            area_id: Number(area_id),
+            venue_id: venue_id ? Number(venue_id) : null,
             uploaded_by
         });
 
@@ -333,11 +344,158 @@ const deletePaper = async (req, res) => {
     }
 };
 
+// ==========================================
+// ATTACH AUTHORS TO A PAPER
+// (only the uploader or an ADMIN)
+// ==========================================
+
+const attachAuthors = async (req, res) => {
+    try {
+        const paperId = Number(req.params.id);
+
+        if (!Number.isInteger(paperId) || paperId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid paper ID"
+            });
+        }
+
+        const { author_ids } = req.body;
+
+        if (!Array.isArray(author_ids) || author_ids.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "author_ids must be a non-empty array"
+            });
+        }
+
+        const paper = await paperService.getPaperById(paperId);
+
+        if (!paper) {
+            return res.status(404).json({
+                success: false,
+                message: "Paper not found"
+            });
+        }
+
+        if (
+            req.user.role !== "ADMIN" &&
+            paper.uploaded_by !== req.user.user_id
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "You can only edit papers you uploaded"
+            });
+        }
+
+        const authorIds = author_ids.map(Number);
+        const attached = await authorService.addPaperAuthors(
+            paperId,
+            authorIds
+        );
+
+        res.status(201).json({
+            success: true,
+            message: "Authors attached to paper",
+            data: attached
+        });
+    } catch (error) {
+        console.error("Error attaching authors:", error);
+
+        if (error.code === "23503") {
+            return res.status(400).json({
+                success: false,
+                message: "One or more author_ids do not exist"
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to attach authors"
+        });
+    }
+};
+
+
+// ==========================================
+// ATTACH KEYWORDS TO A PAPER
+// (only the uploader or an ADMIN)
+// ==========================================
+
+const attachKeywords = async (req, res) => {
+    try {
+        const paperId = Number(req.params.id);
+
+        if (!Number.isInteger(paperId) || paperId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid paper ID"
+            });
+        }
+
+        const { keyword_ids } = req.body;
+
+        if (!Array.isArray(keyword_ids) || keyword_ids.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "keyword_ids must be a non-empty array"
+            });
+        }
+
+        const paper = await paperService.getPaperById(paperId);
+
+        if (!paper) {
+            return res.status(404).json({
+                success: false,
+                message: "Paper not found"
+            });
+        }
+
+        if (
+            req.user.role !== "ADMIN" &&
+            paper.uploaded_by !== req.user.user_id
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "You can only edit papers you uploaded"
+            });
+        }
+
+        const keywordIds = keyword_ids.map(Number);
+        const attached = await keywordService.addPaperKeywords(
+            paperId,
+            keywordIds
+        );
+
+        res.status(201).json({
+            success: true,
+            message: "Keywords attached to paper",
+            data: attached
+        });
+    } catch (error) {
+        console.error("Error attaching keywords:", error);
+
+        if (error.code === "23503") {
+            return res.status(400).json({
+                success: false,
+                message: "One or more keyword_ids do not exist"
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to attach keywords"
+        });
+    }
+};
+
 module.exports = {
     getAllPapers,
     getPaperById,
     searchPapers,
     createPaper,
     updatePaper,
-    deletePaper
+    deletePaper,
+    attachAuthors,
+    attachKeywords
 };

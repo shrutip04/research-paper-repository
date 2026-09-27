@@ -15,12 +15,17 @@ const getAllPapers = async (filters = {}) => {
             p.venue_id,
             pv.name AS venue_name,
             p.uploaded_by,
-            p.created_at
+            p.created_at,
+            COALESCE(ps.citation_count, 0) AS citation_count,
+            COALESCE(ps.download_count, 0) AS download_count,
+            COALESCE(ps.average_rating, 0) AS average_rating
         FROM papers p
         INNER JOIN research_areas ra
             ON p.area_id = ra.area_id
         LEFT JOIN publication_venues pv
             ON p.venue_id = pv.venue_id
+        LEFT JOIN paper_statistics ps
+            ON ps.paper_id = p.paper_id
     `;
 
     const conditions = [];
@@ -87,12 +92,53 @@ const getPaperById = async (paperId) => {
 };
 
 const searchPapers = async (searchTerm) => {
-    const query = `
-        SELECT *
-        FROM search_papers($1);
-    `;
+    // search_papers() is a lightweight ILIKE match on title/abstract/DOI
+    // (paper_id, title, publication_year, paper_type, area_name only).
+    // Re-fetch the matching rows in full -- including venue and the same
+    // live citation/download/rating stats as getAllPapers -- so search
+    // results carry the same shape as the main paper list.
+    const matches = await pool.query(
+        `SELECT paper_id FROM search_papers($1);`,
+        [searchTerm]
+    );
 
-    const result = await pool.query(query, [searchTerm]);
+    const paperIds = matches.rows.map((row) => row.paper_id);
+
+    if (paperIds.length === 0) {
+        return [];
+    }
+
+    const result = await pool.query(
+        `
+        SELECT
+            p.paper_id,
+            p.title,
+            p.abstract,
+            p.publication_year,
+            p.doi,
+            p.paper_type,
+            p.file_url,
+            p.area_id,
+            ra.area_name,
+            p.venue_id,
+            pv.name AS venue_name,
+            p.uploaded_by,
+            p.created_at,
+            COALESCE(ps.citation_count, 0) AS citation_count,
+            COALESCE(ps.download_count, 0) AS download_count,
+            COALESCE(ps.average_rating, 0) AS average_rating
+        FROM papers p
+        INNER JOIN research_areas ra
+            ON p.area_id = ra.area_id
+        LEFT JOIN publication_venues pv
+            ON p.venue_id = pv.venue_id
+        LEFT JOIN paper_statistics ps
+            ON ps.paper_id = p.paper_id
+        WHERE p.paper_id = ANY($1::int[])
+        ORDER BY p.publication_year DESC, p.paper_id;
+        `,
+        [paperIds]
+    );
 
     return result.rows;
 };

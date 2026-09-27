@@ -110,9 +110,55 @@ const getAuthorCollaborations = async (req, res) => {
     }
 };
 
+// ==========================================
+// CREATE A NEW AUTHOR
+// ==========================================
+
+const createAuthor = async (req, res) => {
+    try {
+        const { name, email, affiliation, department, bio } = req.body;
+
+        if (!name || !name.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "name is required"
+            });
+        }
+
+        const author = await authorService.createAuthor({
+            name: name.trim(),
+            email,
+            affiliation,
+            department,
+            bio
+        });
+
+        res.status(201).json({
+            success: true,
+            message: "Author created successfully",
+            data: author
+        });
+    } catch (error) {
+        console.error("Error creating author:", error);
+
+        if (error.code === "23505") {
+            return res.status(409).json({
+                success: false,
+                message: "An author with this email already exists"
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to create author"
+        });
+    }
+};
+
 module.exports = {
     getAllAuthors,
     getAuthorById,
     getAuthorPapers,
-    getAuthorCollaborations
+    getAuthorCollaborations,
+    createAuthor
 };

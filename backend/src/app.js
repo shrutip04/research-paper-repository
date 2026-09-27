@@ -2,6 +2,7 @@ const authorRoutes = require("./routes/authorRoutes");
 
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const paperRoutes = require("./routes/paperRoutes");
 const areaRoutes = require("./routes/areaRoutes");
@@ -15,6 +16,7 @@ const analyticsRoutes = require("./routes/analyticsRoutes");
 const impactRoutes = require("./routes/impactRoutes");
 const authRoutes = require("./routes/authRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const venueRoutes = require("./routes/venueRoutes");
 
 require("dotenv").config();
 
@@ -33,6 +35,11 @@ app.use(cors());
 
 app.use(express.json());
 
+app.use(
+    "/uploads",
+    express.static(path.join(__dirname, "..", "uploads"))
+);
+
 
 // ==========================================
 // ROUTES
@@ -45,6 +52,8 @@ app.use("/api/authors", authorRoutes);
 app.use("/api/areas", areaRoutes);
 
 app.use("/api/keywords", keywordRoutes);
+
+app.use("/api/venues", venueRoutes);
 
 
 // Citation routes
@@ -125,6 +134,30 @@ app.get("/api/health/db", async (req, res) => {
     }
 });
 
+const multer = require("multer");
+
+app.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        return res.status(400).json({
+            success: false,
+            message: `Upload error: ${err.message}`
+        });
+    }
+
+    if (err && err.message === "Only PDF files are allowed") {
+        return res.status(400).json({
+            success: false,
+            message: err.message
+        });
+    }
+
+    console.error("Unhandled error:", err);
+
+    res.status(500).json({
+        success: false,
+        message: "Internal server error"
+    });
+});
 
 // ==========================================
 // START SERVER

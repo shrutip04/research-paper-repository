@@ -54,6 +54,11 @@ function MainLayout() {
                             Admin
                         </NavLink>
                     )}
+                    {user?.role !== "STUDENT" && (
+                        <NavLink to="/submit">
+                            Submit Paper
+                        </NavLink>
+                    )}
 
                 </nav>
 
