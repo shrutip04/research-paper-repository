@@ -910,6 +910,7 @@ function PaperDetails() {
                         </h3>
 
                         <form
+                            className="paper-review-form"
                             onSubmit={handleReviewSubmit}
                         >
 
@@ -919,6 +920,7 @@ function PaperDetails() {
 
                             <select
                                 id="review-rating"
+                                className="form-select"
                                 value={reviewRating}
                                 onChange={(event) =>
                                     setReviewRating(
@@ -954,6 +956,7 @@ function PaperDetails() {
 
                             <textarea
                                 id="review-text"
+                                className="form-textarea"
                                 value={reviewText}
                                 onChange={(event) =>
                                     setReviewText(
