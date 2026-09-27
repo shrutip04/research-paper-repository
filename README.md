@@ -1,8 +1,8 @@
 <div align="center">
 
-![Header](docs/assets/banner.svg)
+[![Typing SVG](https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=800&size=42&pause=1000&color=172033&center=true&vCenter=true&width=600&height=70&lines=ResearchSphere)](https://git.io/typing-svg)
 
-[![Typing SVG](https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=500&size=20&pause=1000&color=5A82D2&center=true&vCenter=true&width=600&lines=PostgreSQL+%2B+Express+%2B+React;Advanced+SQL+%C2%B7+Auth+%2F+RBAC+%C2%B7+Analytics;Built+for+DBMS+%2B+Full-Stack+Coursework)](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=500&size=18&pause=1200&color=5A82D2&center=true&vCenter=true&width=680&lines=Research+Paper+Repository+%2B+Discovery+System;PostgreSQL+%2B+Express+%2B+React;Advanced+SQL+%C2%B7+Auth+%2F+RBAC+%C2%B7+Analytics)](https://git.io/typing-svg)
 
 ![Node](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
@@ -16,7 +16,6 @@
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 
 </div>
-
 ---
 
 ## About
@@ -330,6 +329,6 @@ MIT — built for academic coursework.
 
 Built by **Shruti Pawar** · Computer Engineering, SNDT Women's University (Usha Mittal Institute of Technology), Mumbai
 
-![Footer](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=24,2,6,20&height=100&section=footer)
+[![Typing SVG](https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=500&size=16&pause=1500&color=8A93A8&center=true&vCenter=true&width=520&lines=Built+for+DBMS+%2B+Full-Stack+Coursework;Thanks+for+visiting+this+repo)](https://git.io/typing-svg)
 
 </div>
